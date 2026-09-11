@@ -10,7 +10,7 @@ import (
 const configFileName = ".gatorconfig.json"
 
 type Config struct {
-	Db_url            string `"postgres://example"`
+	Db_url            string `json:"db_url"` //`"postgres://example"`
 	Current_user_name string `json:"current_user_name"`
 }
 

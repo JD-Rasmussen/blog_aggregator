@@ -1,12 +1,18 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/jd-rasmussen/blog_aggregator/internal/config"
+	"github.com/jd-rasmussen/blog_aggregator/internal/database"
 )
 
 type state struct {
+	db  *database.Queries
 	cfg *config.Config
 }
 
@@ -37,8 +43,39 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("No username provided")
 	}
 	username := cmd.args[0]
+
+	_, err := s.db.GetUsers(context.Background(), username)
+	if err != nil {
+		return fmt.Errorf("Error checking if user exists: %v", err)
+	}
 	s.cfg.SetUser(username)
 	fmt.Println("Current user:", username)
 	return nil
+}
 
+func handlerRegister(s *state, cmd command) error { // add new user to the database
+	if len(cmd.args) < 1 {
+		return fmt.Errorf("No username provided")
+	}
+	username := cmd.args[0]
+	//check if user already exists in the database
+	_, err := s.db.GetUsers(context.Background(), username)
+	if err != nil && err != sql.ErrNoRows {
+		return fmt.Errorf("Error checking if user exists: %v", err)
+	}
+	// Add user to the database
+	_, err = s.db.CreateUser(context.Background(), database.CreateUserParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      username,
+	})
+	if err != nil {
+		return fmt.Errorf("Error adding user to database: %v", err)
+	}
+	fmt.Println("User registered:", username)
+
+	handlerLogin(s, command{Name: "login", args: []string{username}}) // Log in the user after registration
+
+	return nil
 }

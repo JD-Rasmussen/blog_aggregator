@@ -79,3 +79,13 @@ func handlerRegister(s *state, cmd command) error { // add new user to the datab
 
 	return nil
 }
+
+func handlerReset(s *state, cmd command) error {
+	// Reset the database
+	err := s.db.ResetDatabase(context.Background())
+	if err != nil {
+		return fmt.Errorf("Error resetting database: %v", err)
+	}
+	fmt.Println("Database reset successfully")
+	return nil
+}

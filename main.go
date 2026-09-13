@@ -37,6 +37,7 @@ func main() {
 
 	cmds.register("login", handlerLogin)       // Register the login command
 	cmds.register("register", handlerRegister) // Register the register command
+	cmds.register("reset", handlerReset)       // Register the reset command
 
 	if len(os.Args) < 2 { //check if a command is presented
 		fmt.Println("No command provided")

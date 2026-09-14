@@ -44,7 +44,7 @@ func handlerLogin(s *state, cmd command) error {
 	}
 	username := cmd.args[0]
 
-	_, err := s.db.GetUsers(context.Background(), username)
+	_, err := s.db.GetUser(context.Background(), username)
 	if err != nil {
 		return fmt.Errorf("Error checking if user exists: %v", err)
 	}
@@ -59,7 +59,7 @@ func handlerRegister(s *state, cmd command) error { // add new user to the datab
 	}
 	username := cmd.args[0]
 	//check if user already exists in the database
-	_, err := s.db.GetUsers(context.Background(), username)
+	_, err := s.db.GetUser(context.Background(), username)
 	if err != nil && err != sql.ErrNoRows {
 		return fmt.Errorf("Error checking if user exists: %v", err)
 	}
@@ -87,5 +87,20 @@ func handlerReset(s *state, cmd command) error {
 		return fmt.Errorf("Error resetting database: %v", err)
 	}
 	fmt.Println("Database reset successfully")
+	return nil
+}
+
+func handlerGetUsers(s *state, cmd command) error { // return all users in the database
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("Error fetching users: %v", err)
+	}
+	for _, user := range users {
+		if s.cfg.Current_user_name == user.Name {
+			fmt.Println(user.Name, "(current)")
+			continue
+		}
+		fmt.Println("User:", user.Name)
+	}
 	return nil
 }

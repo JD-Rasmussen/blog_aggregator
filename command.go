@@ -104,3 +104,27 @@ func handlerGetUsers(s *state, cmd command) error { // return all users in the d
 	}
 	return nil
 }
+
+func HandleAggregateFeeds(s *state, cmd command) error {
+	//fetch rss feeds from url
+	feedURL := "https://www.wagslane.dev/index.xml" //cmd.args[0]
+
+	feed, err := fetchFeed(context.Background(), feedURL)
+	if err != nil {
+		return fmt.Errorf("Error fetching feed: %v", err)
+	}
+
+	fmt.Println("Feed Title:", feed.Channel.Title)
+	fmt.Println("Feed Link:", feed.Channel.Link)
+	fmt.Println("Feed Description:", feed.Channel.Description)
+
+	for _, item := range feed.Channel.Item {
+		fmt.Println("Item Title:", item.Title)
+		fmt.Println("Item Link:", item.Link)
+		fmt.Println("Item Description:", item.Description)
+		fmt.Println("Item PubDate:", item.PubDate)
+	}
+
+	return nil
+
+}

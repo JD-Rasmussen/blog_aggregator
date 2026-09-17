@@ -8,7 +8,6 @@ CREATE TABLE users (
     name VARCHAR(50) UNIQUE NOT NULL
 );
 
-
 -- +goose Down
 
 DROP TABLE users;

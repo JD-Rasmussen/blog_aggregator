@@ -1,0 +1,15 @@
+
+
+-- +goose Up
+CREATE TABLE feeds(
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    name VARCHAR(100) NOT NULL,
+    url VARCHAR(255) NOT NULL UNIQUE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+
+);
+
+-- +goose Down
+DROP TABLE feeds;

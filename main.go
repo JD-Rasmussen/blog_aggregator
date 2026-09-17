@@ -40,6 +40,7 @@ func main() {
 	cmds.register("reset", handlerReset)       // Register the reset command
 	cmds.register("users", handlerGetUsers)    // Register the getusers command
 	cmds.register("agg", HandleAggregateFeeds) // Register the aggregate feeds command
+	cmds.register("addfeed", HandleAddFeed)    // Register the add feed command
 
 	if len(os.Args) < 2 { //check if a command is presented
 		fmt.Println("No command provided")

@@ -128,3 +128,26 @@ func HandleAggregateFeeds(s *state, cmd command) error {
 	return nil
 
 }
+
+func HandleAddFeed(s *state, cmd command) error {
+	if len(cmd.args) < 1 {
+		return fmt.Errorf("No feed URL provided")
+	}
+	feedname := cmd.args[0]
+	feedurl := cmd.args[1]
+
+	// Add feed to the database
+	_, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      feedname,
+		Url:       feedurl,
+	})
+	if err != nil {
+		return fmt.Errorf("Error adding feed to database: %v", err)
+	}
+	fmt.Println("Feed added:", feedname, "with URL:", feedurl)
+
+	return nil
+}

@@ -41,6 +41,7 @@ func main() {
 	cmds.register("users", handlerGetUsers)    // Register the getusers command
 	cmds.register("agg", HandleAggregateFeeds) // Register the aggregate feeds command
 	cmds.register("addfeed", HandleAddFeed)    // Register the add feed command
+	cmds.register("feeds", HandleFeeds)        // Register the get feeds command
 
 	if len(os.Args) < 2 { //check if a command is presented
 		fmt.Println("No command provided")
@@ -52,8 +53,4 @@ func main() {
 		fmt.Println("Error running command:", err)
 		os.Exit(1)
 	}
-
-	fmt.Println("current user:", states.cfg.Current_user_name)
 }
-
-//add something

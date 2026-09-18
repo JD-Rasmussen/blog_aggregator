@@ -136,18 +136,40 @@ func HandleAddFeed(s *state, cmd command) error {
 	feedname := cmd.args[0]
 	feedurl := cmd.args[1]
 
+	user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
+	if err != nil {
+		return fmt.Errorf("Error fetching current user: %v", err)
+	}
+
 	// Add feed to the database
-	_, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+	_, err = s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Name:      feedname,
 		Url:       feedurl,
+		UserID:    uuid.NullUUID{UUID: user.ID, Valid: true},
 	})
 	if err != nil {
 		return fmt.Errorf("Error adding feed to database: %v", err)
 	}
 	fmt.Println("Feed added:", feedname, "with URL:", feedurl)
+
+	return nil
+}
+
+func HandleFeeds(s *state, cmd command) error {
+	// Fetch all feeds in the database
+	feeds, err := s.db.GetFeedsWithUser(context.Background())
+	if err != nil {
+		return fmt.Errorf("Error fetching feeds: %v", err)
+	}
+
+	for _, feed := range feeds {
+		fmt.Println("Feed Name:", feed.Name)
+		fmt.Println("Feed URL:", feed.Url)
+		fmt.Println("Feed Created by:", feed.UserName)
+	}
 
 	return nil
 }

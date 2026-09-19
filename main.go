@@ -35,13 +35,15 @@ func main() {
 
 	states := state{db: dbQueries, cfg: &cfg} // Initialize state with the config
 
-	cmds.register("login", handlerLogin)       // Register the login command
-	cmds.register("register", handlerRegister) // Register the register command
-	cmds.register("reset", handlerReset)       // Register the reset command
-	cmds.register("users", handlerGetUsers)    // Register the getusers command
-	cmds.register("agg", HandleAggregateFeeds) // Register the aggregate feeds command
-	cmds.register("addfeed", HandleAddFeed)    // Register the add feed command
-	cmds.register("feeds", HandleFeeds)        // Register the get feeds command
+	cmds.register("login", handlerLogin)        // Register the login command
+	cmds.register("register", handlerRegister)  // Register the register command
+	cmds.register("reset", handlerReset)        // Register the reset command
+	cmds.register("users", handlerGetUsers)     // Register the getusers command
+	cmds.register("agg", HandleAggregateFeeds)  // Register the aggregate feeds command
+	cmds.register("addfeed", HandleAddFeed)     // Register the add feed command
+	cmds.register("feeds", HandleFeeds)         // Register the get feeds command
+	cmds.register("follow", HandleFollowFeed)   // Register the follow feed command
+	cmds.register("following", HandleFollowing) // Register the following command
 
 	if len(os.Args) < 2 { //check if a command is presented
 		fmt.Println("No command provided")

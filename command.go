@@ -155,6 +155,8 @@ func HandleAddFeed(s *state, cmd command) error {
 	}
 	fmt.Println("Feed added:", feedname, "with URL:", feedurl)
 
+	HandleFollowFeed(s, command{Name: "follow", args: []string{feedurl}}) // Follow the feed after adding it
+
 	return nil
 }
 
@@ -169,6 +171,58 @@ func HandleFeeds(s *state, cmd command) error {
 		fmt.Println("Feed Name:", feed.Name)
 		fmt.Println("Feed URL:", feed.Url)
 		fmt.Println("Feed Created by:", feed.UserName)
+	}
+
+	return nil
+}
+
+func HandleFollowFeed(s *state, cmd command) error {
+	if len(cmd.args) < 1 {
+		return fmt.Errorf("No feed name provided")
+	}
+	feedurl := cmd.args[0]
+	feed, err := s.db.GetFeedByUrl(context.Background(), feedurl)
+	if err != nil {
+		return fmt.Errorf("Error fetching feed: %v", err)
+	}
+
+	user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
+	if err != nil {
+		return fmt.Errorf("Error fetching current user: %v", err)
+	}
+
+	// Add feed follow to the database
+	_, err = s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    uuid.NullUUID{UUID: user.ID, Valid: true},
+		FeedID:    uuid.NullUUID{UUID: feed.ID, Valid: true},
+	})
+	if err != nil {
+		return fmt.Errorf("Error following feed: %v", err)
+	}
+	fmt.Println("User", user.Name, "is now following feed:", feed.Name, "with URL:", feed.Url)
+
+	return nil
+}
+
+func HandleFollowing(s *state, cmd command) error {
+	user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
+	if err != nil {
+		return fmt.Errorf("Error fetching current user: %v", err)
+	}
+
+	// Fetch all feeds followed by the current user
+	followedFeeds, err := s.db.GetFeedFollowsForUser(context.Background(), uuid.NullUUID{UUID: user.ID, Valid: true})
+	if err != nil {
+		return fmt.Errorf("Error fetching followed feeds: %v", err)
+	}
+
+	for _, feedFollow := range followedFeeds {
+		fmt.Println("Feed Name:", feedFollow.FeedName)
+		fmt.Println("Feed URL:", feedFollow.FeedID) // Assuming you want to print the Feed ID here
+		fmt.Println("Followed by User:", feedFollow.UserName)
 	}
 
 	return nil
